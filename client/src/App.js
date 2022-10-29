@@ -1,25 +1,27 @@
 import logo from './logo.svg';
-import './App.css';
 
+// Styled Components
+import styled from 'styled-components';
+// Components
+import Dashboard from './components/Dashboard/Dashboard.index';
+import Navbar from "./components/Navbar/Navbar.index.js";
+import Footer from "./components/Footer/Footer.index.js";
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+      <Navbar />
+      <Dashboard />
+      <Footer />
+    </Container>
   );
 }
+
+const Container = styled.div`
+  min-height: 100vh;
+  display: grid;
+  grid-template-areas: 
+    "Navbar Body"
+    "Footer Footer";
+`;
 
 export default App;
