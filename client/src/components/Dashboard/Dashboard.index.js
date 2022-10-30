@@ -29,7 +29,8 @@ import {
     Legend,
 } from "chart.js";
 
-import { newsData } from "../../TestData/SampleNews.js";
+import { Colors, SecondaryColors } from "../../ColorPallete.js";
+
 
 
 import { Line } from 'react-chartjs-2';
@@ -49,11 +50,10 @@ ChartJS.register(
 
 
 const Dashboard = () => {
-    let total = 0;
-
+    const [currOilPrice, setCurrOilPrice] = useState(0);
+    const [currOilPriceChange, setCurrOilPriceChange] = useState(0);
     const [oilData, setOilData] = useState({});
     const [oilNewsData, setOilNewsData] = useState([]);
-    const [currPage, setCurrPage] = useState(1);
 
     useEffect(() => {
         
@@ -63,7 +63,7 @@ const Dashboard = () => {
                 method: 'GET',
                 url: 'https://api.oilpriceapi.com/v1/prices/past_year?by_code=WTI_USD&by_type=daily_average_price',
                 headers: {
-                    'Authorization': 'Token 559000023ac8401ac45307ff36fa1a61',
+                    'Authorization': 'Token 6373332452363f7f6e52386e18604881',
                     'Content-Type': 'application/json'
                 },
                 params: {
@@ -81,7 +81,7 @@ const Dashboard = () => {
                     method: 'GET',
                     url: 'https://api.oilpriceapi.com/v1/prices/past_year?by_code=WTI_USD&by_type=daily_average_price',
                     headers: {
-                        'Authorization': 'Token 559000023ac8401ac45307ff36fa1a61',
+                        'Authorization': 'Token 43d6af8aaf931b4a5d237f9649c5eb0c',
                         'Content-Type': 'application/json'
                     },
                     params: {
@@ -125,6 +125,8 @@ const Dashboard = () => {
                 data: returnData,
                 labels: returnLabels
             });
+            setCurrOilPrice(responses[responses.length-1].price);
+            setCurrOilPriceChange(responses[responses.length-1].price-responses[responses.length-2].price)
         }
 
         const fetchOilNews = async () => {
@@ -155,7 +157,7 @@ const Dashboard = () => {
           },
           title: {
             display: true,
-            text: 'Chart.js Line Chart',
+            text: 'Commodity Price vs. Time',
           },
         },
         
@@ -169,8 +171,8 @@ const Dashboard = () => {
           {
             label: 'Price of Oil',
             data: oilData.data,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: Colors.Color1,
+            backgroundColor: Colors.Color1,
             tension: 0.3,
           },
           {
@@ -189,26 +191,37 @@ const Dashboard = () => {
                 <h1 style={{marginBottom:"25px", marginLeft:"10px"}}>Overview</h1>
                 <ChartsContainer1>
                     <SmallChartWrapper style={{gridArea: "chart1"}}>
-                        <p>Oil price</p>
-                        <PriceArrow priceChange={2} />
-                        <Price priceChange={2}> $21</Price>
+                        <p style={{fontWeight: "bold"}}>Oil price</p>
+                        <div style={{display:"flex"}}>
+                            <PriceArrow priceChange={currOilPriceChange} />
+                            <Price priceChange={2}> ${currOilPrice}</Price>
+                        </div>
                     </SmallChartWrapper>
                     <SmallChartWrapper style={{gridArea: "chart2"}}>
-                        <p>Natural Gas Price</p>
-                        <PriceArrow priceChange={2} />
-                        <Price priceChange={2}> $21</Price>
+                        <p style={{fontWeight: "bold"}}>Natural Gas Price</p>
+                        <div style={{display:"flex"}}>
+                            <PriceArrow priceChange={2} />
+                            <Price priceChange={2}> $21</Price>
+                        </div>
                     </SmallChartWrapper>
-                    <SmallChartWrapper style={{gridArea: "chart3"}}></SmallChartWrapper>
-                    <SmallChartWrapper style={{gridArea: "chart4"}}></SmallChartWrapper>
+                    <SmallChartWrapper style={{gridArea: "chart3"}}>
+                        <p style={{fontWeight: "bold"}}>Oil Production</p>
+                        <div style={{display:"flex"}}>
+                            <PriceArrow priceChange={2} />
+                            <Price priceChange={2}> 21 M Barrels</Price>
+                        </div>  
+                    </SmallChartWrapper>
+                    <SmallChartWrapper style={{gridArea: "chart4"}}>
+                        <p style={{fontWeight: "bold"}}>Natural Gas Production</p>
+                        <div style={{display:"flex"}}>
+                            <PriceArrow priceChange={2} />
+                            <Price priceChange={2}> 21 MCF</Price>
+                        </div>
+                    </SmallChartWrapper>
                     <MainChartWrapper>
                         <Line options={options} data={data} />
                     </MainChartWrapper>
                 </ChartsContainer1>
-                <ChartsContainer2>
-                    <SmallChartWrapper style={{gridArea: "chart5"}}></SmallChartWrapper>
-                    <SmallChartWrapper style={{gridArea: "chart6"}}></SmallChartWrapper>
-                    <SmallChartWrapper style={{gridArea: "chart7"}}></SmallChartWrapper>
-                </ChartsContainer2>
 
 
                 <NewsWrapper style={{"&::-webkit-scrollbar" : {display: "none"}}}>

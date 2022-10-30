@@ -32,9 +32,10 @@ export const SmallChartWrapper = styled.div`
     background-color: ${SecondaryColors.Color3};
     border-radius: 25px;
     margin: 10px;
-
+    padding: 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
 `;
 
@@ -63,8 +64,10 @@ export const NewsWrapper = styled.div`
 `;
 
 export const NewsCard = styled.div`
-    background-color: ${Colors.Color4};
-    margin: 1px;
+    background-color: ${SecondaryColors.Color3};
+    border-radius: 25px;
+    margin: 5px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: top;
@@ -77,6 +80,7 @@ export const NewsCard = styled.div`
 `;
 
 export const PriceArrow = styled.div`
+    padding: 10px 0px 0px 0px;
     ${(props) => { 
         return props.priceChange < 0 ? `
             width: 0; 
