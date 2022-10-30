@@ -47,70 +47,136 @@ ChartJS.register(
 
 
 
-export const options = {
-    maintainAspectRatio: false,
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom',
-      },
-      title: {
-        display: true,
-        text: 'Chart.js Line Chart',
-      },
-    },
-    scales: {
-        yAxes: [{
-            display: true,
-            ticks: {
-                suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
-                // OR //
-                beginAtZero: true   // minimum value will be 0.
-            }
-        }]
-    }
-  };
-  
-  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  
-  export const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Price of Oil',
-        data: [233, 249, 322, 514, 872, 876, 968],
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        tension: 0.3,
-      },
-      {
-        label: 'Price of Natural Gas',
-        // Add Data Here
-        data: [289, 862, 421, 551, 766, 957, 804],
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-        tension: 0.3
-      },
-    ],
-  };
+
+
 
 const Dashboard = () => {
-    const [count, setCount] = useState(0);
-    const [oilChartData, setOilChartData] = useState([]);
+    let total = 0;
+    const [ready, setReady] = useState(false);
+    const [oilChartData, setOilChartData] = useState({data:[], labels:[]});
     const [oilNewsData, setOilNewsData] = useState([]);
 
     useEffect(() => {
-        axios({
-            method: 'GET',
-            url: 'https://oil-news-global.p.rapidapi.com/news',
-            headers: {
-              'X-RapidAPI-Key': '4d19490205msha79beac20e0eafcp1a47dfjsn6e48bdf22c11',
-              'X-RapidAPI-Host': 'oil-news-global.p.rapidapi.com'
-            }
-        }).then(res => {
-            setOilNewsData(res.data);
-        });
-    }, []);
+        let currPage = 1;
+        let maxPage = 1;
+
+        const fetchOilPrices = async (page=1) => {
+            await axios({
+                method: 'GET',
+                url: 'https://api.oilpriceapi.com/v1/prices/past_year?by_code=WTI_USD&by_type=daily_average_price',
+                headers: {
+                    'Authorization': 'Token 268eac307ba3c850170f9a28dc072bd2',
+                    'Content-Type': 'application/json'
+                },
+                params: {
+                    by_type: 'daily_average_price',
+                    page: `${page}`
+                }
+            }).then(async ( res ) => {
+                maxPage = Math.ceil(parseInt(res.headers.total) / 100);
+                currPage += 1;
+                const data = res.data.data.prices;
+                const return_obj = {
+                    data: [data.map(obj => {return obj.price})],
+                    labels: [data.map(obj => {return (new Date(obj.created_at)).getMonth()})]
+                }
+                return return_obj;
+            }).then(async(data) => {
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                let obj = {
+                    data:[],
+                    labels:[]
+                }
+                let currMonth = data.labels[0][0];
+                let totalMonths = 1;
+                
+                let totalMonthlyOil = 0;
+                let totalMonthlyEntries = 0;
+
+                for(let i = 0; (i < data.data[0].length) && (totalMonths < 13); i++){
+                    if(data.labels[0][i] != currMonth){
+                        // add to obj
+                        obj.data = [...obj.data, totalMonthlyOil/totalMonthlyEntries]
+                        obj.labels = [...obj.labels, currMonth];
+                        // incrememnt month and reset
+                        totalMonths += 1;
+                        totalMonthlyEntries = 0;
+                        totalMonthlyOil = 0;
+                        currMonth = data.labels[0][i];
+                    }
+                    totalMonthlyEntries += 1;
+                    totalMonthlyOil += data.data[0][i]
+                }
+                setOilChartData({
+                    data:[...oilChartData.data, ...obj.data],
+                    labels:[...oilChartData.labels, ...obj.labels],
+                });
+            }).then(()=>{
+                if(currPage <= maxPage){
+                    fetchOilPrices(currPage);
+                }
+            });
+            
+        }
+        
+        const fetchOilNews = async () => {
+            axios({
+                method: 'GET',
+                url: 'https://oil-news-global.p.rapidapi.com/news',
+                headers: {
+                  'X-RapidAPI-Key': '4d19490205msha79beac20e0eafcp1a47dfjsn6e48bdf22c11',
+                  'X-RapidAPI-Host': 'oil-news-global.p.rapidapi.com'
+                }
+            }).then(res => {
+                setOilNewsData(res.data);
+            });
+        }
+        
+        fetchOilPrices(currPage);
+        fetchOilNews();
+        
+        }, []);
+
+    
+    const options = {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+          title: {
+            display: true,
+            text: 'Chart.js Line Chart',
+          },
+        },
+        
+      };
+      
+      const labels = oilChartData.labels;
+      
+      const data = {
+        labels,
+        datasets: [
+          {
+            label: 'Price of Oil',
+            data: oilChartData.data,
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            tension: 0.3,
+          },
+          {
+            label: 'Price of Natural Gas',
+            // Add Data Here
+            data: [289, 862, 421, 551, 766, 957, 804],
+            borderColor: 'rgb(53, 162, 235)',
+            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            tension: 0.3
+          },
+        ],
+      };
+
+      console.log(oilChartData);
     return (
             <DashboardWrapper>
                 <h1 style={{marginBottom:"25px", marginLeft:"10px"}}>Overview</h1>
@@ -120,7 +186,11 @@ const Dashboard = () => {
                         <PriceArrow priceChange={2} />
                         <Price priceChange={2}> $21</Price>
                     </SmallChartWrapper>
-                    <SmallChartWrapper style={{gridArea: "chart2"}}></SmallChartWrapper>
+                    <SmallChartWrapper style={{gridArea: "chart2"}}>
+                        <p>Natural Gas Price</p>
+                        <PriceArrow priceChange={2} />
+                        <Price priceChange={2}> $21</Price>
+                    </SmallChartWrapper>
                     <SmallChartWrapper style={{gridArea: "chart3"}}></SmallChartWrapper>
                     <SmallChartWrapper style={{gridArea: "chart4"}}></SmallChartWrapper>
                     <MainChartWrapper>
@@ -155,5 +225,6 @@ const Dashboard = () => {
             
     );
 }
+
 
 export default Dashboard;
