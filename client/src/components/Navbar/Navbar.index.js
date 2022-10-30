@@ -1,12 +1,31 @@
 import React from "react";
 
 import {
-    NavbarWrapper
+    NavbarWrapper,
+    NavbarTitle,
+    NavLinksWrapper,
+    NavLinkWrapper,
+    NavLink
 } from "./Navbar.styles.js";
+import {Link} from "react-router-dom";
 
-const Navbar = () => {
+
+const Navbar = (props) => {
     return (
-        <NavbarWrapper></NavbarWrapper>
+        <NavbarWrapper>
+            <NavbarTitle>Ol' App</NavbarTitle>
+            <NavLinksWrapper>
+                <NavLinkWrapper>
+                    <NavLink to="/">Overview</NavLink>
+                </NavLinkWrapper>
+                <NavLinkWrapper>
+                    <NavLink>WO</NavLink>
+                </NavLinkWrapper>
+                <NavLinkWrapper>
+                    <NavLink to="Page2">Leaf</NavLink>
+                </NavLinkWrapper>
+            </NavLinksWrapper>
+        </NavbarWrapper>
     );
 }
 

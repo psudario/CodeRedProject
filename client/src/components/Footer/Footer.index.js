@@ -6,8 +6,8 @@ import {
 
 const Footer = () => {
     return (
-        <FooterWrapper>
-            
+        <FooterWrapper style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <p style={{color:"white"}}>This is a footers</p>
         </FooterWrapper>
     );
 }

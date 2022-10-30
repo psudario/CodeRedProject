@@ -1,18 +1,27 @@
 import logo from './logo.svg';
+import {Route, Routes} from "react-router-dom";
 
 // Styled Components
 import styled from 'styled-components';
 // Components
-import Dashboard from './components/Dashboard/Dashboard.index';
 import Navbar from "./components/Navbar/Navbar.index.js";
 import Footer from "./components/Footer/Footer.index.js";
+
+//Pages
+import Dashboard from './components/Dashboard/Dashboard.index.js';
+import Environment from './components/Environment/Environment.index.js';
+
 function App() {
   return (
     <Container>
       <Navbar />
-      <Dashboard />
+        <Routes>
+          <Route path="/" element={<Dashboard/>}/>
+          <Route path="/Page2" element={<Environment/>}/>
+        </Routes>
       <Footer />
     </Container>
+    
   );
 }
 
@@ -22,6 +31,8 @@ const Container = styled.div`
   grid-template-areas: 
     "Navbar Body"
     "Footer Footer";
+  grid-template-columns: 15vw auto;
+  grid-template-rows: 100vh 20vh;
 `;
 
 export default App;
